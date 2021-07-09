@@ -1,95 +1,74 @@
-import React, { useEffect, useState } from "react";
-import ToDoItem from "./ToDoItem";
-import InputArea from "./InputArea";
-import "../style.css"
-import firebase, {db, firestore } from "../config"
-// import firestore from "firebase"
+import React, { createContext, useEffect, useState } from "react";
+import TodoItem from "./TodoItem";
+import "./componentStyle.css";
+import {db} from "../firebase"
+
+const listOfTodos = createContext();
+const setListOfTodos = createContext();
 
 
-
+function numFiller(n) {
+  if(n>9)return(n);
+  else return('0'+n);
+}
 
 function App() {
 
-  const [inputText, setInputText] = useState({"title": "","content": "","id":"",});
-  const [items, setItems] = useState([]);
-
-  function fetchTodos() {
-    db.collection("Todos").get()
-    .then((ss)=>{
-      let lis = [];
-      ss.forEach((item)=>{lis.push(item.data())});
-      setItems(lis);
-    }
-    )
-    .catch()
-    
-  }
-
+  const [input, setInput] = useState("");
+  const [todoList, setTodoList] = useState([]);
   
 
-  function handleChange(event) {
-    const {name, value} = event.target;
-    setInputText((prev)=>{
-      return({
-        ...prev,
-        [name]:value,
-      });
+
+  function addToDo() {
+    if(input === "")return;
+    let today = new Date();
+    let hr = numFiller(today.getHours());
+    let time = hr + ":" + numFiller(today.getMinutes()) + (hr > 11 ? " pm":" am");
+    let dateTime = time;
+
+    let newTodo = {"id": Date.now().toString(), "content":input, "time":dateTime};
+    db.collection("List").doc(newTodo["id"]).set(newTodo)
+    .then()
+    .catch((e)=>{
+      console.log("Error occured "+ e);
     });
+
+    setInput("");
   }
 
-  function addItem() {
-    if (inputText.content === "")return
-    db.collection("Todos").add(inputText)
-    .then((docref)=>{
-      inputText.id = docref.id;
-      setItems((prev) => {
-        return [inputText, ...prev];
-      });
+  useEffect(()=>{
+      db.collection("List")
+      .onSnapshot((ss)=>{
+      setTodoList(ss.docs.map((item)=>item.data()).sort((a, b)=> (b["id"]-a["id"])));
     })
-    .catch();
+    },[]);
+    
+  return(
+    <listOfTodos.Provider value={todoList}>
+      <setListOfTodos.Provider value={setTodoList}>
+        <div className="app">
+          <div className="input-todo">
+            <form action="" onSubmit={(e)=>{e.preventDefault()}}>
+              <input type="text" placeholder="Add todo here" value={input} 
+                onChange={(e)=> setInput(e.target.value)}/>
+                
+                <button onClick={addToDo}>ADD</button>
+            </form>
+          </div>
+            
 
-    setInputText({
-      "title": "",
-      "content": "",
-      "id":""
-    });
-
-    console.log(items);
-  }
-
-  function deleteItem(id) {
-    setItems((prevItems) => {
-      return prevItems.filter((item, index) => {
-        return item.id !== id;
-      });
-    });
-    db.collection("Todos").doc(id).delete();
-  }
-
-
-  //Fetches all todos from database
-  useEffect(fetchTodos, []);
-
-  return (
-    <div className="container">
-      <div className="heading">
-        <h1>To-Do List</h1>
-      </div>
-      <InputArea onChange={handleChange} onClick={addItem} text={inputText} />
-      <div>
-        <ul>
-          {items.map((todoItem, index) => (
-            <ToDoItem
-              key={index}
-              id={todoItem.id}
-              text={todoItem}
-              onChecked={deleteItem}
-            />
-          ))}
-        </ul>
-      </div>
-    </div>
+          <div className="show-todo">
+            {todoList.map((elem)=>{
+                return(<TodoItem key={elem.id} id={elem.id} todo={elem.content} time={elem.time}/>)
+              })}
+          </div>
+        </div>
+      </setListOfTodos.Provider>
+    </listOfTodos.Provider>
   );
 }
 
+
+
 export default App;
+export { listOfTodos, setListOfTodos };
