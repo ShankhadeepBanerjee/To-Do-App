@@ -44,8 +44,6 @@ button:hover {
 
 .icon {
 	margin: 2px;
-	/* background: #044c75; */
-
 	border-radius: 50%;
 	opacity: 0.8;
 }
@@ -54,10 +52,17 @@ button:hover {
 	transform: scale(1.1);
 	cursor: pointer;
 	opacity: 1;
-	color: #ff2e63;
+	color: #ff2e62e5;
 }
 .icon:focus {
 	outline: none;
+}
+
+.hidden {
+	display: none;
+	width: 0;
+	padding: 0;
+	margin: 0;
 }
 
 /* Navbar section  */
@@ -98,32 +103,39 @@ button:hover {
 }
 .input-todo form {
 	display: flex;
-	height: 40px;
-	align-items: center;
-}
-.input-todo input:nth-child(1) {
-	flex: 1;
-	border-radius: 20px;
-	padding: 10px;
+	position: relative;
+	flex-direction: column;
 	background: var(--secondary);
-	color: #492f10;
-	border: none;
 	box-shadow: 0 3px 10px 0 grey;
 }
-.input-todo input:focus {
-	outline: 0;
+.input-todo form > div:nth-child(1) {
+	width: auto;
+	max-height: 200px;
+	overflow: hidden;
+}
+.input-todo form > div:nth-child(1) img {
+	width: 100%;
 }
 
-.file-upload {
-	visibility: hidden;
-	width: 0;
+.input-todo form > div:nth-child(2) {
+	display: flex;
+	flex: 1;
+}
+.input-todo form > div:nth-child(2) input {
+	flex: 1;
+	height: 40px;
+	border-radius: 10px;
+	border: 0;
+}
+.input-todo form > div:nth-child(2) input:focus {
+	outline: none;
+	box-shadow: 0 3px 10px 0 grey;
 }
 
-.input-submit-btn {
-	visibility: hidden;
-	width: 0;
-	padding: 0;
-	margin: 0;
+.input-todo div:nth-child(3) {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 }
 
 /* Todo Display Section  */
@@ -141,24 +153,55 @@ button:hover {
 .todo-item:hover {
 	box-shadow: 0 2px 2px 0 black;
 }
+.todo-item > div:nth-child(1) {
+	width: auto;
+	max-height: 200px;
+	overflow: hidden;
+}
+.todo-item > div:nth-child(1) img {
+	width: 100%;
+	cursor: pointer;
+}
 
-.todo-item :nth-child(1) {
+.todo-item > div:nth-child(2) {
+	height: fit-content;
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
 }
-.todo-item :nth-child(1) :nth-child(1) {
+.todo-item > div:nth-child(2) :nth-child(1) {
 	flex: 1;
 }
 
-.todo-item div:nth-child(2) {
+.todo-item > div:nth-child(3) {
 	font-size: 0.75rem;
 	opacity: 0.5;
 }
 
+.modal-img-div {
+	margin: 20px auto;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 80vw;
+	height: fit-content;
+	background: rgba(176, 209, 208, 0.26);
+	border-radius: 5%;
+}
+.modal-img-div:focus {
+	outline: none;
+}
+
+.modal-img-div img {
+	/* height: 100vh; */
+	width: 100%;
+}
 /* For editing State */
+.edit-todo form {
+	display: flex;
+	height: fit-content;
+}
 .edit-todo input {
-	width: 80%;
+	flex: 1;
 	height: 40px;
 	border-radius: 20px;
 	border: none;
