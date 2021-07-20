@@ -6,8 +6,6 @@ import "./componentStyle.css";
 import { auth, db } from "../firebase";
 // import firebase from "firebase/app";
 
-const inputCtx = createContext();
-const setInputCtx = createContext();
 const listOfTodos = createContext();
 const setListOfTodos = createContext();
 const user = createContext();
@@ -30,23 +28,6 @@ function App() {
 			setTodoList([]);
 		}
 	}, [User]);
-
-	useEffect(() => {
-		auth.onAuthStateChanged((user) => {
-			if (user) {
-				let username = user.displayName.split(" ")[0];
-				let userPhoto = user.photoURL;
-				setUser({
-					username: username,
-					userPhoto: userPhoto,
-					uid: user.uid,
-				});
-			} else {
-				console.log("signed Out");
-				setUser(null);
-			}
-		});
-	}, []);
 
 	return (
 		<user.Provider value={User}>
@@ -79,4 +60,4 @@ function App() {
 }
 
 export default App;
-export { inputCtx, setInputCtx, listOfTodos, setListOfTodos, userSetter, user };
+export { listOfTodos, setListOfTodos, userSetter, user };
