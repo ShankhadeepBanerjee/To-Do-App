@@ -7,7 +7,7 @@ User can also embed image in a Todo.
 
 ## Site Link: https://todo-app-21b75.web.app/
 
-![Alt](img/Screen1.png?raw=true)
+![Alt](img/Screen2.png?raw=true)
 ![Alt](img/Screen.png?raw=true)
 
 # Getting Started with Create React App
