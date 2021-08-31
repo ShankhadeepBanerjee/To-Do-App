@@ -10,10 +10,12 @@ const listOfTodos = createContext();
 const setListOfTodos = createContext();
 const user = createContext();
 const userSetter = createContext();
+const themeContext = createContext();
 
 function App() {
 	const [todoList, setTodoList] = useState([]);
 	const [User, setUser] = useState(null);
+	const [theme, setTheme] = useState(0);
 
 	useEffect(() => {
 		if (User) {
@@ -34,24 +36,36 @@ function App() {
 			<userSetter.Provider value={setUser}>
 				<listOfTodos.Provider value={todoList}>
 					<setListOfTodos.Provider value={setTodoList}>
-						<div className="app">
-							<Nav />
-							{User && (
-								<>
-									<InputTodo />
-									<div className="show-todo">
-										{todoList.map((elem) => {
-											return (
-												<TodoItem
-													key={elem.id}
-													todoObject={elem}
-												/>
-											);
-										})}
-									</div>
-								</>
-							)}
-						</div>
+						<themeContext.Provider value={{ theme, setTheme }}>
+							<div className="app">
+								<Nav />
+								{User ? (
+									<>
+										<InputTodo />
+										<div className="show-todo">
+											{todoList.map((elem) => {
+												return (
+													<TodoItem
+														key={elem.id}
+														todoObject={elem}
+													/>
+												);
+											})}
+										</div>
+									</>
+								) : (
+									<h1
+										className="example"
+										style={{
+											textAlign: "center",
+											marginTop: "40vh",
+										}}
+									>
+										Welcome to ToDo App
+									</h1>
+								)}
+							</div>
+						</themeContext.Provider>
 					</setListOfTodos.Provider>
 				</listOfTodos.Provider>
 			</userSetter.Provider>
@@ -60,4 +74,4 @@ function App() {
 }
 
 export default App;
-export { listOfTodos, setListOfTodos, userSetter, user };
+export { listOfTodos, setListOfTodos, userSetter, user, themeContext };

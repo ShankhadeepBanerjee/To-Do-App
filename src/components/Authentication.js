@@ -1,10 +1,6 @@
 import { auth } from "../firebase";
 import firebase from "firebase/app";
 var provider = new firebase.auth.GoogleAuthProvider();
-// import { userSetter } from "./App";
-// import { useContext } from "react";
-
-// const setUser = useContext(userSetter);
 
 function signInWithGoogle() {
 	auth.signInWithPopup(provider)

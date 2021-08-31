@@ -77,3 +77,8 @@ li {
 	position: relative;
 	padding: 0.5rem;
 }
+
+.imge {
+	width: 500px;
+	height: 500px;
+}

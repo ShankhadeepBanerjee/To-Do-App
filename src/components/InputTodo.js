@@ -3,17 +3,34 @@ import { user } from "./App";
 import { db, storage } from "../firebase";
 import ImageIcon from "@material-ui/icons/Image";
 import AddIcon from "@material-ui/icons/Add";
+import DeleteIcon from "@material-ui/icons/Delete";
+import Tooltip from "@material-ui/core/Tooltip";
 
 function getTimeInHrMin() {
 	let today = new Date();
 	let hr = today.getHours();
 	let min = today.getMinutes();
+	let date =
+		" " +
+		today.getDate() +
+		"." +
+		(today.getMonth() + 1) +
+		"." +
+		today.getFullYear();
 	let time =
-		(hr > 9 ? hr : "0" + hr) +
+		(hr % 12 > 9 ? hr % 12 : "0" + (hr % 12)) +
 		":" +
 		(min > 9 ? min : "0" + min) +
-		(hr > 11 ? " pm" : " am");
+		(hr > 11 ? " pm" : " am") +
+		date;
 	return time;
+}
+
+function removeToDoInputImage() {
+	let inputImg = document.querySelector(".input-img");
+	inputImg.src = "";
+	let todoFile = document.querySelector(".file-choose");
+	todoFile.value = ""; // making The upload file empty
 }
 
 function InputTodo() {
@@ -23,9 +40,12 @@ function InputTodo() {
 		done: null,
 		time: "",
 	});
-	const User = useContext(user);
 
-	// Gets Image Url if any then calls addTodo function
+	const [deleteIcon, setDeleteIcon] = useState(null); //handles Delete Icon's Visisbility if user chooses image to upload
+
+	const User = useContext(user); // User Context from App.js
+
+	// Gets Image Url if any, then calls addTodo function
 	function getImageUrlAndAddTodo() {
 		if (todoObject.content === "") return;
 
@@ -37,31 +57,32 @@ function InputTodo() {
 			done: false,
 			time: getTimeInHrMin(),
 		};
+
 		setTodoObject((prev) => {
 			return { ...prev, content: "" };
 		});
 
 		let todoFile = document.querySelector(".file-choose");
 		if (todoFile.files[0]) {
-			const name = Date.now() + " - " + todoFile.files[0].name;
-			const metaData = { contentType: todoFile.files[0].type };
+			const imgObj = todoFile.files[0];
+			const name = Date.now() + " - " + imgObj.name;
+			const metaData = { contentType: imgObj.type };
 			const ref = storage.ref();
 			const imageFileRef =
 				"Images/" + User.username + User.uid + "/" + name;
 			ref.child(imageFileRef)
-				.put(todoFile.files[0], metaData)
+				.put(imgObj, metaData)
 				.then((ss) => ss.ref.getDownloadURL())
 				.then((url) => {
 					newTodo.image = url;
 					newTodo.imageRef = imageFileRef;
-					todoFile.value = "";
 					addTodo(newTodo);
 				});
 		} else {
 			addTodo(newTodo);
 		}
-		let inputImg = document.querySelector(".input-img");
-		inputImg.src = "";
+		removeToDoInputImage();
+		setDeleteIcon(null);
 	}
 
 	// Addes a new Todo object to database
@@ -89,7 +110,7 @@ function InputTodo() {
 				</div>
 
 				<div>
-					<input
+					<textarea
 						type="text"
 						placeholder="Add Todo Here..."
 						value={todoObject.content}
@@ -110,30 +131,63 @@ function InputTodo() {
 							let todoFile = document.querySelector(
 								".file-choose"
 							);
-							if (todoFile.files[0])
-								document.querySelector(
-									".input-img"
-								).src = URL.createObjectURL(todoFile.files[0]);
+							if (todoFile.files[0]) {
+								let fileSize = (
+									todoFile.files[0].size /
+									1024 /
+									1024
+								).toFixed(4);
+								if (fileSize < 1) {
+									document.querySelector(
+										".input-img"
+									).src = URL.createObjectURL(
+										todoFile.files[0]
+									);
+
+									setDeleteIcon(1);
+								} else {
+									alert(
+										"Please Select a file with size less than 1MB"
+									);
+									todoFile.value = "";
+								}
+							}
 						}}
 					/>
 
-					<ImageIcon
-						className="icon"
-						onClick={() => {
-							document.querySelector(".file-choose").click();
-						}}
-					/>
+					<Tooltip title="Upload Image">
+						<ImageIcon
+							className="icon"
+							onClick={() => {
+								document.querySelector(".file-choose").click();
+							}}
+						/>
+					</Tooltip>
+
+					{deleteIcon && (
+						<Tooltip title="Delete Image">
+							<DeleteIcon
+								className="icon"
+								onClick={() => {
+									removeToDoInputImage();
+									setDeleteIcon(null);
+								}}
+							/>
+						</Tooltip>
+					)}
 
 					<button
 						className="input-submit hidden"
 						type="submit"
 					></button>
-					<AddIcon
-						className="icon"
-						onClick={() =>
-							document.querySelector(".input-submit").click()
-						}
-					/>
+					<Tooltip title="Add ToDo">
+						<AddIcon
+							className="icon"
+							onClick={() =>
+								document.querySelector(".input-submit").click()
+							}
+						/>
+					</Tooltip>
 				</div>
 			</form>
 		</div>

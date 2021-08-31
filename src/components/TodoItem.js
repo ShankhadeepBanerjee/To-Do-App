@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import "./componentStyle.css";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
+import Tooltip from "@material-ui/core/Tooltip";
 import Modal from "@material-ui/core/Modal";
 import { db, storage } from "../firebase";
 import { user } from "./App";
@@ -40,7 +41,7 @@ function TodoItem(props) {
 				console.error("Error removing document: ", error);
 			});
 
-		if ("imageRef" in props.todoObject) {
+		if ("image" in props.todoObject && props.todoObject.image !== null) {
 			storage
 				.ref()
 				.child(props.todoObject.imageRef)
@@ -60,7 +61,6 @@ function TodoItem(props) {
 			.doc(props.todoObject.id)
 			.update({
 				content: todo,
-				time: getTimeInHrMin(),
 				done: done,
 			})
 			.then()
@@ -111,7 +111,7 @@ function TodoItem(props) {
 								updateTodo();
 							}}
 						>
-							<input
+							<textarea
 								type="text"
 								value={todo}
 								onChange={(e) => setTodo(e.target.value)}
@@ -120,7 +120,7 @@ function TodoItem(props) {
 						</form>
 					</div>
 				) : (
-					<span
+					<pre
 						style={
 							done
 								? {
@@ -131,26 +131,32 @@ function TodoItem(props) {
 						}
 					>
 						{todo}
-					</span>
+					</pre>
 				)}
 
 				{!editing && (
-					<input
-						type="checkbox"
-						className="icon"
-						checked={done}
-						onChange={() => {
-							done ? setDone(false) : setDone(true);
-						}}
-					/>
+					<Tooltip title="done">
+						<input
+							type="checkbox"
+							className="icon"
+							checked={done}
+							onChange={() => {
+								done ? setDone(false) : setDone(true);
+							}}
+						/>
+					</Tooltip>
 				)}
 				{!editing && (
-					<EditIcon
-						className="icon"
-						onClick={() => setEditing(true)}
-					></EditIcon>
+					<Tooltip title="Edit">
+						<EditIcon
+							className="icon"
+							onClick={() => setEditing(true)}
+						></EditIcon>
+					</Tooltip>
 				)}
-				<DeleteIcon className="icon" onClick={deleteTodo} />
+				<Tooltip title="Delete">
+					<DeleteIcon className="icon" onClick={deleteTodo} />
+				</Tooltip>
 			</div>
 
 			<div>

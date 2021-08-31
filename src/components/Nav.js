@@ -4,13 +4,19 @@ import {
 	signUpWithEmail,
 	signInWithEmail,
 } from "./Authentication";
-import { user, userSetter } from "./App";
+
+import { user, userSetter, themeContext } from "./App";
 import { auth } from "../firebase";
 import Modal from "@material-ui/core/Modal";
+import Tooltip from "@material-ui/core/Tooltip";
+
+import back1 from "../assets/trees/back1.png";
+import back2 from "../assets/trees/back2.png";
 
 function Nav() {
 	const User = useContext(user);
 	const setUser = useContext(userSetter);
+	const { theme, setTheme } = useContext(themeContext);
 
 	const [navUser, setNavUser] = useState({
 		username: "",
@@ -75,22 +81,50 @@ function Nav() {
 		});
 	}, []);
 
+	useEffect(() => {
+		let path = `url(${theme ? back1 : back2})`;
+		document.querySelector("#root").style.setProperty("background", path);
+	}, [theme]);
+
 	return (
 		<div className="nav">
+			<Tooltip title="Theme">
+				<span
+					className="theme"
+					onClick={() => {
+						setTheme((prev) => !prev);
+					}}
+				>
+					{theme ? (
+						<i className="fas fa-moon fa-2x"></i>
+					) : (
+						<i
+							className="fas fa-sun fa-2x"
+							style={{ color: "#fff" }}
+						></i>
+					)}
+				</span>
+			</Tooltip>
+
 			{User ? (
 				<span className="user">
 					<h2>{User.username}</h2>
-					<img
-						src={User.userPhoto}
-						alt=""
-						onClick={() => {
-							auth.signOut();
-							setUser(null);
-						}}
-					/>
+					<Tooltip
+						title="Sign Out"
+						style={{ backGround: "White", color: "Black" }}
+					>
+						<img
+							src={User.userPhoto}
+							alt=""
+							onClick={() => {
+								auth.signOut();
+								setUser(null);
+							}}
+						/>
+					</Tooltip>
 				</span>
 			) : (
-				<>
+				<span>
 					<button
 						onClick={() => {
 							setOption("Sign Up");
@@ -180,7 +214,7 @@ function Nav() {
 							</div>
 						}
 					</Modal>
-				</>
+				</span>
 			)}
 		</div>
 	);
